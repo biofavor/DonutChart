@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:d="http://ns.adobe.com/fxg/2008/dt"
+		 verticalAlign="middle"
+		 paddingLeft="10"
+		 gap="15"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" minHeight="100" minWidth="100" width="200" height="200">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			private var _label:String;
+			private var _oldValue:Number=0;
+			private var _newValue:Number;
+			/**
+			 * 旧值。
+			 * @author dailylucky.cn
+			 */
+			public function get oldValue():Number
+			{
+				return _oldValue;
+			}
+			
+			public function set oldValue(oldValue:Number):void
+			{
+				_oldValue=oldValue;
+			}
+			/**
+			 * 新值。
+			 * @author dailylucky.cn
+			 */
+			public function get newValue():Number
+			{
+				return _newValue;
+			}
+			public function set newValue(newValue:Number):void
+			{
+				_newValue=newValue;
+				if(_newValue==_oldValue)
+				{
+					triangle.alpha=0;
+				}
+				if(_newValue-_oldValue<0)
+				{
+					triangleFill.color=0xB63625;
+					triangle.rotation=180;
+				}
+				else
+				{
+					triangleFill.color=0x52E136;
+				}
+				//修正字体大小
+				valueTxt.text=newValue.toString();
+				labelTxt.setStyle('fontSize',this.height*0.14);
+				valueTxt.setStyle('fontSize',this.height*0.25);
+			}
+			/**
+			 * 标签。
+			 * @author dailylucky.cn
+			 */
+			public function get label():String
+			{
+				return _label;
+			}
+			public function set label(label:String):void
+			{
+				labelTxt.text=label;
+			}
+		]]>
+	</fx:Script>
+	<s:HGroup d:userLabel="标题和文字" verticalAlign="middle">
+		<s:RichText id="labelTxt" d:userLabel="流量" alpha="1" blendMode="normal" color="#897777"
+					fontFamily="宋体" fontSize="14" kerning="off" whiteSpaceCollapse="preserve"/>
+		<s:Path id="triangle" alpha="1" blendMode="normal" data="M 5 0 L 0 5 L 11 5 L 5 0 Z"
+				winding="evenOdd">
+			<s:fill>
+				<s:SolidColor id="triangleFill" color="#52e136"/>
+			</s:fill>
+		</s:Path>
+	</s:HGroup>
+	<s:RichText id="valueTxt" d:userLabel="值" alpha="1" blendMode="normal"
+				color="#999999" fontSize="25" fontWeight="bold"
+				kerning="off" whiteSpaceCollapse="preserve"/>
+</s:VGroup>

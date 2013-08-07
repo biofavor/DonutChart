@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:local="*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:HGroup>
+		<local:DonutChart oldValue="1.8" newValue="1.5"/>
+		<local:DonutChartLabel height="100" width="100" oldValue="1.8" newValue="1.5" label="流量"/>
+		<local:DonutChart height="150" width="150"  oldValue="100" newValue="150"/>
+		<local:DonutChartLabel height="150" width="150"  oldValue="100" newValue="150"  label="流量"/>
+		<local:DonutChart height="180" width="180"  oldValue="100" newValue="160"/>
+		<local:DonutChart height="200" width="200"  oldValue="100" newValue="190"/>
+	</s:HGroup>
+</s:Application>

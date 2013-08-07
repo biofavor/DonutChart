@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--- 好看的甜甜圈图表。新老数据增长或者降低的直观表示。组件宽度高度手动指定一样！不然丑死。
+@author dailylucky.cn
+*     <table class="innertable">
+*        <tr>
+*           <th>属性</th>
+*           <th>类型</th>
+*           <th>描述</th>
+*        </tr>
+*        <tr>
+*           <td>oldValue</td>
+*           <td>Number</td>
+*           <td>旧值</td>
+*        </tr>
+*        <tr>
+*           <td>newValue</td>
+*           <td>Number</td>
+*           <td>新值</td>
+*        </tr>
+*     </table>
+-->
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" minHeight="100" minWidth="100" height="100" width="100">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import flash.sampler.NewObjectSample;
+			import flash.utils.flash_proxy;
+			
+			import mx.events.FlexEvent;
+			private var sector:Sprite=new Sprite();
+			private var _oldValue:Number;
+			private var _newValue:Number;
+			/**
+			 * 旧值。
+			 * @author dailylucky.cn
+			 */
+			public function get oldValue():Number
+			{
+				return _oldValue;
+			}
+			
+			public function set oldValue(oldValue:Number):void
+			{
+				_oldValue=oldValue;
+			}
+			/**
+			 * 新值。
+			 * @author dailylucky.cn
+			 */
+			public function get newValue():Number
+			{
+				return _newValue;
+			}
+			public function set newValue(newValue:Number):void
+			{
+				_newValue=newValue;
+			}
+			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number) : void
+			{
+				drawSector(this.width/2,this.height/2,this.width/2,0,Math.abs((newValue-oldValue)/oldValue*360),-90);
+				label.text=(100*((newValue-oldValue)/oldValue)).toFixed(0).toString()+"%";
+				//修正颜色，字体大小
+				label.setStyle('fontSize',Math.abs(this.width/5));
+				changeColor(newValue-oldValue);
+				con.addChild(sector);
+				//修正innerPie的距离
+				innerPie.bottom=this.width/20;
+				innerPie.top=this.width/20;
+				innerPie.left=this.width/20;
+				innerPie.right=this.width/20;
+				
+				super.updateDisplayList(unscaledWidth, unscaledHeight);
+			}
+			private function changeColor(value:Number):void
+			{
+				if(value<0)
+				{
+					outerCircleFill.color=0xE23E29;
+					innerPieFill.color=0xE23E29;
+					label.setStyle('color',0xE23E29);
+				}
+				else if(value>0&&value<50)
+				{
+					outerCircleFill.color=0x66EE66;
+					innerPieFill.color=0x66EE66;
+					label.setStyle('color',0x66EE66);
+					label.text="+"+label.text
+				}
+				else if(value>50&&value<75)
+				{
+					outerCircleFill.color=0xFDBB39;
+					innerPieFill.color=0xFDBB39;
+					label.setStyle('color',0xFDBB39);
+					label.text="+"+label.text
+				}
+				else if(value>75&&value<100)
+				{
+					outerCircleFill.color=0x87CEEB;
+					innerPieFill.color=0x87CEEB;
+					label.setStyle('color',0x87CEEB);
+					label.text="+"+label.text
+				}
+			}
+			//画扇形，真心不容易。
+			private function drawSector(x:Number, y:Number, r:Number, R:Number, angle:Number, startA:Number):void
+			{
+				sector.graphics.clear();
+				sector.graphics.lineStyle(1,0,1,true);
+				sector.graphics.beginFill(0xFA9100);
+				if(Math.abs(angle)>360)
+				{
+					angle=360;
+				}
+				var n:Number=Math.ceil(Math.abs(angle));
+				var angleA:Number=angle/n;
+				angleA=angleA*Math.PI/180;
+				startA=startA*Math.PI/180;
+				var startB:Number=startA;
+				//起始边
+				sector.graphics.moveTo(x+r*Math.cos(startA),y+r*Math.sin(startA));
+				sector.graphics.lineTo(x+R*Math.cos(startA),y+R*Math.sin(startA));
+				//外圆弧
+				for(var i:int=1;i<n;i++)
+				{
+					startA+=angleA;
+					var angleMid1:Number=startA-angleA/2; 
+					var bx:Number=x+R/Math.cos(angleA/2)* Math.cos(angleMid1); 
+					var by:Number=y+R/Math.cos(angleA/2)*Math.sin(angleMid1); 
+					var cx:Number=x+R*Math.cos(startA); 
+					var cy:Number=y+R*Math.sin(startA); 
+					sector.graphics.curveTo(bx, by, cx, cy);
+				}
+				// 内圆起点 
+				sector.graphics.lineTo(x+r*Math.cos(startA),y+r * Math.sin(startA)); 
+				// 内圆弧 
+				for (var j:int=n;j>1;j--) 
+				{ 
+					startA-= angleA;
+					var angleMid2:Number=startA + angleA / 2;
+					var bx2:Number=x + r / Math.cos(angleA / 2) * Math.cos(angleMid2);
+					var by2:Number=y + r / Math.cos(angleA / 2) * Math.sin(angleMid2);
+					var cx2:Number=x + r * Math.cos(startA);
+					var cy2:Number=y + r * Math.sin(startA);
+					sector.graphics.curveTo(bx2, by2, cx2, cy2);
+				} 
+				//内圆终点 
+				sector.graphics.lineTo(x+r*Math.cos(startB),y+r*Math.sin(startB)); 
+				//完成 
+				sector.graphics.endFill(); 
+			} 
+			
+		]]>
+	</fx:Script>
+	<s:Path id="outerCircle" top="0" bottom="0" left="0" right="0" alpha="1" blendMode="normal"
+			data="M 49 0 C 75 0 97 22 97 49 C 97 75 75 97 49 97 C 22 97 0 75 0 49 C 0 22 22 0 49 0 Z M 49 3 C 74 3 94 23 94 49 C 94 74 74 94 49 94 C 23 94 3 74 3 49 C 3 23 23 3 49 3 Z"
+			winding="evenOdd">
+		<s:fill>
+			<s:SolidColor id="outerCircleFill" color="#66ee66"/>
+		</s:fill>
+	</s:Path>
+	<s:Path id="innerPie" top="10" bottom="10" left="10" right="10" alpha="1" blendMode="normal"
+			data="M 44 0 C 68 0 88 19 88 44 C 88 68 68 88 44 88 C 19 88 0 68 0 44 C 0 19 19 0 44 0 Z M 44 10 C 62 10 77 25 77 44 C 77 62 62 77 44 77 C 25 77 10 62 10 44 C 10 25 25 10 44 10 Z"
+			winding="evenOdd" mask="{con}">
+		<s:fill>
+			<s:SolidColor id="innerPieFill" color="#66ee66"/>
+		</s:fill>
+	</s:Path>
+	<s:RichText id="label" verticalCenter="0" horizontalCenter="0" alpha="1" blendMode="normal" color="#66ee66" fontSize="20" fontWeight="bold" kerning="off"
+				whiteSpaceCollapse="preserve"/>
+	<s:SpriteVisualElement id="con" left="0" right="0" bottom="0" top="0"/>
+</s:Group>
